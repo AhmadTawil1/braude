@@ -47,6 +47,12 @@ class Course:
         for i in range(len(data.data_list)):
             type = data.types_list[i]
             row = [row.text.strip() for row in data.data_list[i].find_all('div', class_="row")[1]]
+            
+            # Filter by semester ב only
+            semester = row[1] if len(row) > 1 else ""
+            if semester != "ב":
+                continue  # Skip lessons not in semester ב
+            
             lesson = Lesson(type, row[3], row[5], row[7], row[9])
             
             match type:
@@ -56,5 +62,8 @@ class Course:
                     self.add_practice(lesson)
                 case "מעבדה":
                     self.add_lab(lesson)
+                case "שו\"ת":  # Seminar/Tutorial
+                    self.add_practice(lesson)
                 case _:
-                    pass
+                    # For any unknown type, add as practice
+                    self.add_practice(lesson)
