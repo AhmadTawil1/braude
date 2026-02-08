@@ -434,34 +434,123 @@ button:disabled {
 }
 
 @media (max-width: 768px) {
-    .schedule-grid {
-        grid-template-columns: 70px repeat(6, 1fr);
-        gap: 4px;
-        overflow-x: auto;
+    body {
+        padding: 10px;
     }
 
-    .grid-header,
-    .time-label {
-        font-size: 0.85rem;
-        padding: 10px 6px;
-    }
-
-    .schedule-cell {
-        font-size: 0.75rem;
-        padding: 8px 4px;
-        min-height: 60px;
-    }
-
-    .lesson-course {
-        font-size: 0.85rem;
-    }
-
-    .lesson-type {
-        font-size: 0.7rem;
+    header {
+        padding: 15px;
+        margin-bottom: 20px;
     }
 
     header h1 {
         font-size: 1.8rem;
+    }
+
+    .subtitle {
+        font-size: 0.95rem;
+    }
+
+    /* Better mobile schedule grid */
+    .schedule-section {
+        padding: 15px;
+        overflow-x: auto;
+    }
+
+    .schedule-grid {
+        grid-template-columns: 60px repeat(6, minmax(80px, 1fr));
+        gap: 3px;
+        overflow-x: auto;
+        min-width: 600px;
+    }
+
+    .grid-header,
+    .time-label {
+        font-size: 0.75rem;
+        padding: 8px 4px;
+    }
+
+    .schedule-cell {
+        font-size: 0.7rem;
+        padding: 6px 3px;
+        min-height: 50px;
+    }
+
+    .lesson-course {
+        font-size: 0.75rem;
+        margin-bottom: 2px;
+    }
+
+    .lesson-type {
+        font-size: 0.65rem;
+    }
+
+    .lesson-lecturer {
+        font-size: 0.6rem;
+    }
+
+    /* Mobile-friendly navigation */
+    .schedule-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .schedule-nav {
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .nav-btn {
+        padding: 12px 24px;
+        font-size: 1rem;
+        min-width: 100px;
+    }
+
+    .schedule-counter {
+        font-size: 1rem;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    /* Mobile sidebar */
+    .sidebar {
+        margin-bottom: 20px;
+    }
+
+    .course-input-section {
+        padding: 15px;
+    }
+
+    #courseId {
+        font-size: 1rem;
+        padding: 14px;
+    }
+
+    #addCourseBtn {
+        font-size: 1rem;
+        padding: 14px 28px;
+    }
+
+    .course-list-section {
+        max-height: 250px;
+    }
+
+    .course-item {
+        padding: 12px;
+    }
+
+    .course-name {
+        font-size: 0.95rem;
+    }
+
+    .course-id {
+        font-size: 0.8rem;
+    }
+
+    .remove-btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
     }
 }
 

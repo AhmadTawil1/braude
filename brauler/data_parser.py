@@ -41,13 +41,14 @@ class Parser:
         return about_list
 
     def get_data(self):
-        data_list = self.html.find_all('div', class_='Table container ncontainer WithSearch')
-        last_index = len(data_list)
-
-        for index in range(last_index):
-            all_children = data_list[index].find_all("div", class_="row")
-            if len(all_children) != 2:
-                last_index = index
-                break
-            
-        return data_list[0:last_index]
+        # Find all potential lesson data containers
+        all_data_divs = self.html.find_all('div', class_='Table container ncontainer WithSearch')
+        
+        # Filter to only include divs with exactly 2 rows (header + data)
+        valid_data_list = []
+        for div in all_data_divs:
+            rows = div.find_all("div", class_="row")
+            if len(rows) == 2:
+                valid_data_list.append(div)
+        
+        return valid_data_list

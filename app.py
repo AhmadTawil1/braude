@@ -56,9 +56,11 @@ def add_course():
         
         # Generate ALL possible schedules
         all_schedules = list(scheduler.generate_schedules(courses_store[session_id], 1, 1, 1))
+        print(f"DEBUG: Generated {len(all_schedules)} total schedules")  # Debug
         
         # Filter valid schedules
         valid_schedules = [s for s in all_schedules if all(scheduler.has_required_lessons(c, l) for c, l in s)]
+        print(f"DEBUG: {len(valid_schedules)} valid schedules after filtering")  # Debug
         
         # Convert to serializable format and store in session
         session['all_schedules_count'] = len(valid_schedules)
@@ -66,9 +68,13 @@ def add_course():
         
         # Get current schedule (keep as objects for formatting)
         schedule_data = valid_schedules[0] if valid_schedules else None
+        print(f"DEBUG: schedule_data is {'None' if schedule_data is None else 'valid'}")  # Debug
         
         # Store schedules in memory (not in session) using session_id as key
         schedules_cache[session_id] = valid_schedules
+        
+        formatted_schedule = format_schedule(schedule_data) if schedule_data else None
+        print(f"DEBUG: formatted_schedule has {len(formatted_schedule) if formatted_schedule else 0} lessons")  # Debug
         
         return jsonify({
             'success': True,
@@ -80,7 +86,7 @@ def add_course():
                 'labs': len(course.labs),
                 'practices': len(course.practices)
             },
-            'schedule': format_schedule(schedule_data) if schedule_data else None,
+            'schedule': formatted_schedule,
             'total_schedules': len(valid_schedules),
             'current_index': 0
         })

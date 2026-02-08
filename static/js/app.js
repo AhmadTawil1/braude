@@ -73,13 +73,7 @@ async function addCourse() {
     input.classList.remove('error');
 
     if (!courseId) {
-        showError('אנא הזן מספר קורס');
-        return;
-    }
-
-    // Validate number
-    if (!/^\d+$/.test(courseId)) {
-        showError('מספר קורס לא תקין');
+        alert('אנא הכנס מספר קורס');
         return;
     }
 
@@ -91,23 +85,32 @@ async function addCourse() {
         const response = await fetch('/api/courses', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ course_id: parseInt(courseId) })
+            body: JSON.stringify({ course_id: parseInt(courseId) }), // Ensure course_id is an integer
         });
 
         const data = await response.json();
+        console.log('Add course response:', data); // Debug logging
 
         if (!response.ok) {
             throw new Error(data.error || 'שגיאה בהוספת קורס');
         }
 
+        // Ensure we have course data
+        if (!data.course) {
+            throw new Error('לא התקבל מידע על הקורס');
+        }
+
         // Add to courses list
         courses.push(data.course);
+        console.log('Current courses:', courses); // Debug logging
 
         // Update UI
         updateCourseList();
-        updateSchedule(data.schedule);
+
+        // Update schedule even if it's null (will clear if needed)
+        updateSchedule(data.schedule || null);
 
         // Update schedule navigation
         totalSchedules = data.total_schedules || 1;
@@ -118,7 +121,8 @@ async function addCourse() {
         input.value = '';
 
     } catch (error) {
-        showError(error.message);
+        console.error('Error adding course:', error); // Debug logging
+        alert(`שגיאה: ${error.message}`);
     } finally {
         addButton.disabled = false;
         addButton.textContent = 'הוסף';
@@ -200,10 +204,16 @@ function updateCourseList() {
 
 // Update schedule grid
 function updateSchedule(schedule) {
+    console.log('updateSchedule called with:', schedule); // Debug
+    console.log('Schedule type:', typeof schedule); // Debug
+    console.log('Schedule is array:', Array.isArray(schedule)); // Debug
+    console.log('Schedule length:', schedule ? schedule.length : 'null'); // Debug
+
     // Clear all cells
     clearSchedule();
 
     if (!schedule || schedule.length === 0) {
+        console.log('No schedule data to display'); // Debug
         return;
     }
 
@@ -212,6 +222,7 @@ function updateSchedule(schedule) {
     // Group lessons by course
     const courseMap = new Map();
     schedule.forEach(lesson => {
+        console.log('Processing lesson:', lesson); // Debug
         if (!courseMap.has(lesson.course_id)) {
             courseMap.set(lesson.course_id, []);
         }
