@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanzim Braude - Academic Schedule Builder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>Tanzim Braude</h1>
+            <p class="subtitle">Smart Academic Schedule Builder for Braude College</p>
+        </header>
+
+        <!-- Main Content: Schedule Left, Controls Right -->
+        <div class="main-content">
+            <!-- Schedule Grid (Left Side) -->
+            <div class="schedule-section">
+                <div class="schedule-header">
+                    <h2>מערכת שעות</h2>
+                    <div class="schedule-nav" id="scheduleNav" style="display: none;">
+                        <button onclick="navigateSchedule('prev')" id="prevBtn" class="nav-btn">← הקודם</button>
+                        <span class="schedule-counter">
+                            אפשרות <span id="currentIndex">1</span> מתוך <span id="totalSchedules">1</span>
+                        </span>
+                        <button onclick="navigateSchedule('next')" id="nextBtn" class="nav-btn">הבא →</button>
+                    </div>
+                </div>
+                <div class="schedule-grid" id="scheduleGrid">
+                    <!-- Header Row -->
+                    <div class="grid-header"></div>
+                    <div class="grid-header">א'</div>
+                    <div class="grid-header">ב'</div>
+                    <div class="grid-header">ג'</div>
+                    <div class="grid-header">ד'</div>
+                    <div class="grid-header">ה'</div>
+                    <div class="grid-header">ו'</div>
+
+                    <!-- Time Slots -->
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Right Sidebar: Course Input and List -->
+            <div class="sidebar">
+                <!-- Course Input -->
+                <div class="input-section">
+                    <h2>הוספת קורס</h2>
+                    <div class="input-group">
+                        <input type="text" id="courseInput" placeholder="מספר קורס (לדוגמה: 61954)"
+                            onkeypress="if(event.key === 'Enter') addCourse()">
+                        <button onclick="addCourse()" id="addButton">הוסף</button>
+                    </div>
+                    <div id="errorMessage" class="error-message"></div>
+                </div>
+
+                <!-- Course List -->
+                <div class="course-list-section">
+                    <h2>קורסים שנוספו</h2>
+                    <div id="courseList" class="course-list">
+                        <p class="empty-message">טרם נוספו קורסים</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>

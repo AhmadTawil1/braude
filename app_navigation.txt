@@ -1,0 +1,35 @@
+
+@app.route('/api/schedule/navigate/<direction>', methods=['POST'])
+def navigate_schedule(direction):
+    """Navigate to next or previous schedule"""
+    try:
+        all_schedules = session.get('all_schedules', [])
+        current_index = session.get('current_schedule_index', 0)
+        
+        if not all_schedules:
+            return jsonify({
+                'success': False,
+                'error': 'אין מערכות זמינות'
+            }), 404
+        
+        # Update index
+        if direction == 'next' and current_index < len(all_schedules) - 1:
+            current_index += 1
+        elif direction == 'prev' and current_index > 0:
+            current_index -= 1
+        
+        session['current_schedule_index'] = current_index
+        schedule_data = all_schedules[current_index]
+        
+        return jsonify({
+            'success': True,
+            'schedule': format_schedule(schedule_data),
+            'current_index': current_index,
+            'total_schedules': len(all_schedules)
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
