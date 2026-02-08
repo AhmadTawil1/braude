@@ -19,6 +19,11 @@ class Course:
         self.about = ""
         self.get_course_data()
     
+    @property
+    def lessons(self):
+        """Return all lessons as a flat list"""
+        return self.lectures + self.labs + self.practices
+    
     def add_lecture(self, lecture):
         self.lectures.append(lecture)
 

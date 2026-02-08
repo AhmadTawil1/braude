@@ -76,6 +76,16 @@ def add_course():
         formatted_schedule = format_schedule(schedule_data) if schedule_data else None
         print(f"DEBUG: formatted_schedule has {len(formatted_schedule) if formatted_schedule else 0} lessons")  # Debug
         
+        # Format lesson options for frontend
+        def format_lesson_option(lesson):
+            return {
+                'type': lesson.type,
+                'day': lesson.day,
+                'start': lesson.start,
+                'finish': lesson.finish,
+                'lecturer': lesson.lecturer
+            }
+        
         return jsonify({
             'success': True,
             'course': {
@@ -84,7 +94,12 @@ def add_course():
                 'points': course.points,
                 'lectures': len(course.lectures),
                 'labs': len(course.labs),
-                'practices': len(course.practices)
+                'practices': len(course.practices),
+                'lesson_options': {
+                    'lectures': [format_lesson_option(l) for l in course.lectures],
+                    'labs': [format_lesson_option(l) for l in course.labs],
+                    'practices': [format_lesson_option(l) for l in course.practices]
+                }
             },
             'schedule': formatted_schedule,
             'total_schedules': len(valid_schedules),

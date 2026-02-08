@@ -32,6 +32,155 @@ const COLORS = [
     'color-5', 'color-6', 'color-7', 'color-8', 'color-9'
 ];
 
+// Initialize
+// Assuming loadCourses() is a function that needs to be defined elsewhere or is a placeholder.
+// For now, it's added as per instruction.
+// loadCourses(); // This line was in the instruction but not in the original file. Keeping it commented as it's not defined.
+
+// Lesson Selection Modal Logic
+let currentCourseData = null;
+let selectedLessons = {};
+
+function showLessonSelectionModal(courseData) {
+    currentCourseData = courseData;
+    selectedLessons = {};
+
+    const modal = document.getElementById('lessonModal');
+    const modalCourseName = document.getElementById('modalCourseName');
+    const lessonOptions = document.getElementById('lessonOptions');
+
+    modalCourseName.textContent = courseData.name;
+
+    // Build lesson options HTML
+    let html = '';
+
+    // Check if there are multiple options for any lesson type
+    const hasMultipleLectures = courseData.lesson_options.lectures.length > 1;
+    const hasMultipleLabs = courseData.lesson_options.labs.length > 1;
+    const hasMultiplePractices = courseData.lesson_options.practices.length > 1;
+
+    // Only show modal if there are multiple options
+    if (!hasMultipleLectures && !hasMultipleLabs && !hasMultiplePractices) {
+        return false; // Don't show modal
+    }
+
+    // Lectures
+    if (courseData.lesson_options.lectures.length > 0) {
+        html += '<div class="lesson-type-section">';
+        html += '<h4>הרצאות</h4>';
+        courseData.lesson_options.lectures.forEach((lesson, idx) => {
+            const isOnlyOption = courseData.lesson_options.lectures.length === 1;
+            html += `
+                <div class="lesson-option ${isOnlyOption ? 'selected' : ''}" 
+                     data-type="lecture" 
+                     data-index="${idx}"
+                     ${isOnlyOption ? 'style="pointer-events: none;"' : ''}>
+                    <div class="lesson-info">
+                        <div class="lesson-time">${lesson.day} ${lesson.start}-${lesson.finish}</div>
+                        <div class="lesson-lecturer">${lesson.lecturer}</div>
+                    </div>
+                </div>
+            `;
+            if (isOnlyOption) selectedLessons.lecture = idx;
+        });
+        html += '</div>';
+    }
+
+    // Labs
+    if (courseData.lesson_options.labs.length > 0) {
+        html += '<div class="lesson-type-section">';
+        html += '<h4>מעבדות</h4>';
+        courseData.lesson_options.labs.forEach((lesson, idx) => {
+            const isOnlyOption = courseData.lesson_options.labs.length === 1;
+            html += `
+                <div class="lesson-option ${isOnlyOption ? 'selected' : ''}" 
+                     data-type="lab" 
+                     data-index="${idx}"
+                     ${isOnlyOption ? 'style="pointer-events: none;"' : ''}>
+                    <div class="lesson-info">
+                        <div class="lesson-time">${lesson.day} ${lesson.start}-${lesson.finish}</div>
+                        <div class="lesson-lecturer">${lesson.lecturer}</div>
+                    </div>
+                </div>
+            `;
+            if (isOnlyOption) selectedLessons.lab = idx;
+        });
+        html += '</div>';
+    }
+
+    // Practices
+    if (courseData.lesson_options.practices.length > 0) {
+        html += '<div class="lesson-type-section">';
+        html += '<h4>תרגילים</h4>';
+        courseData.lesson_options.practices.forEach((lesson, idx) => {
+            const isOnlyOption = courseData.lesson_options.practices.length === 1;
+            html += `
+                <div class="lesson-option ${isOnlyOption ? 'selected' : ''}" 
+                     data-type="practice" 
+                     data-index="${idx}"
+                     ${isOnlyOption ? 'style="pointer-events: none;"' : ''}>
+                    <div class="lesson-info">
+                        <div class="lesson-time">${lesson.day} ${lesson.start}-${lesson.finish}</div>
+                        <div class="lesson-lecturer">${lesson.lecturer}</div>
+                    </div>
+                </div>
+            `;
+            if (isOnlyOption) selectedLessons.practice = idx;
+        });
+        html += '</div>';
+    }
+
+    lessonOptions.innerHTML = html;
+
+    // Add click handlers to lesson options
+    document.querySelectorAll('.lesson-option').forEach(option => {
+        option.addEventListener('click', function () {
+            const type = this.dataset.type;
+            const index = parseInt(this.dataset.index);
+
+            // Deselect other options of the same type
+            document.querySelectorAll(`.lesson-option[data-type="${type}"]`).forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            // Select this option
+            this.classList.add('selected');
+            selectedLessons[type] = index;
+        });
+    });
+
+    modal.style.display = 'block';
+    return true;
+}
+
+function closeModal() {
+    document.getElementById('lessonModal').style.display = 'none';
+    currentCourseData = null;
+    selectedLessons = {};
+}
+
+// Modal event listeners
+document.getElementById('closeModal').addEventListener('click', closeModal);
+document.getElementById('cancelSelection').addEventListener('click', closeModal);
+
+document.getElementById('confirmSelection').addEventListener('click', () => {
+    // For now, just close the modal
+    // In a full implementation, you would send the selected lessons to the backend
+    // and regenerate the schedule with only those lessons
+    console.log('Selected lessons:', selectedLessons);
+    console.log('Course:', currentCourseData);
+    closeModal();
+    alert('בחירת שיעורים נשמרה! (תכונה זו תושלם בגרסה הבאה)');
+});
+
+// Close modal when clicking outside
+window.addEventListener('click', (event) => {
+    const modal = document.getElementById('lessonModal');
+    if (event.target === modal) {
+        closeModal();
+    }
+});
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     initializeScheduleGrid();
@@ -108,6 +257,17 @@ async function addCourse() {
 
         // Update UI
         updateCourseList();
+
+        // Check if we should show lesson selection modal
+        const hasMultipleOptions =
+            data.course.lesson_options.lectures.length > 1 ||
+            data.course.lesson_options.labs.length > 1 ||
+            data.course.lesson_options.practices.length > 1;
+
+        if (hasMultipleOptions) {
+            // Show modal for lesson selection
+            showLessonSelectionModal(data.course);
+        }
 
         // Update schedule even if it's null (will clear if needed)
         updateSchedule(data.schedule || null);

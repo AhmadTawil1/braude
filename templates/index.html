@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tanzim Braude - Academic Schedule Builder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
 </head>
 
 <body>
@@ -65,6 +66,21 @@
                         <p class="empty-message">טרם נוספו קורסים</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson Selection Modal -->
+    <div id="lessonModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>בחר שיעורים עבור <span id="modalCourseName"></span></h3>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <div id="lessonOptions" class="lesson-options"></div>
+            <div class="modal-actions">
+                <button id="confirmSelection" class="btn-primary">אישור בחירה</button>
+                <button id="cancelSelection" class="btn-secondary">ביטול</button>
             </div>
         </div>
     </div>

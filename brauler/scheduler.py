@@ -20,7 +20,8 @@ def find_non_overlapping_lessons(course, max_lectures, max_labs, max_practices):
         for combo in combinations(all_lessons, size):
             lectures = [lesson for lesson in combo if lesson.type == 'הרצאה']
             labs = [lesson for lesson in combo if lesson.type == 'מעבדה']
-            practices = [lesson for lesson in combo if lesson.type == 'תרגיל']
+            # Check if lesson is in course.practices instead of checking type
+            practices = [lesson for lesson in combo if lesson in course.practices]
 
             if (len(lectures) <= max_lectures and len(labs) <= max_labs and len(practices) <= max_practices and
                 all(not do_lessons_overlap(lesson1, lesson2) for lesson1, lesson2 in combinations(combo, 2))
@@ -61,9 +62,12 @@ def calculate_schedule_score(schedule):
     return sum(len(lessons) for _, lessons in schedule)
 
 def has_required_lessons(course, lessons):
+    # Check if schedule includes required lessons from each category
     has_lecture = any(lesson.type == 'הרצאה' for lesson in lessons)
     has_lab = any(lesson.type == 'מעבדה' for lesson in lessons)
-    has_practice = any(lesson.type == 'תרגיל' for lesson in lessons)
+    # Check for any practice-type lesson (תרגיל, שו"ת, etc.)
+    has_practice = any(lesson in course.practices for lesson in lessons)
+    
     return (not course.lectures or has_lecture) and (not course.labs or has_lab) and (not course.practices or has_practice)
 
 def scheduler(courses):
