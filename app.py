@@ -54,6 +54,44 @@ def add_course():
         course = Course(course_id)
         courses_store[session_id].append(course)
         
+        # Check if course has any lessons
+        total_lessons = len(course.lectures) + len(course.labs) + len(course.practices)
+        
+        if total_lessons == 0:
+            # Course has no lessons - add it but don't regenerate schedule
+            print(f"DEBUG: Course {course_id} has no lessons, skipping schedule generation")
+            
+            # Format lesson options (will be empty)
+            def format_lesson_option(lesson):
+                return {
+                    'type': lesson.type,
+                    'day': lesson.day,
+                    'start': lesson.start,
+                    'finish': lesson.finish,
+                    'lecturer': lesson.lecturer
+                }
+            
+            return jsonify({
+                'success': True,
+                'course': {
+                    'id': course.id,
+                    'name': course.name,
+                    'points': course.points,
+                    'lectures': 0,
+                    'labs': 0,
+                    'practices': 0,
+                    'lesson_options': {
+                        'lectures': [],
+                        'labs': [],
+                        'practices': []
+                    }
+                },
+                'schedule': None,  # Don't change existing schedule
+                'total_schedules': session.get('all_schedules_count', 0),
+                'current_index': session.get('current_schedule_index', 0),
+                'no_lessons': True  # Flag to indicate course has no lessons
+            })
+        
         # Generate ALL possible schedules
         all_schedules = list(scheduler.generate_schedules(courses_store[session_id], 1, 1, 1))
         print(f"DEBUG: Generated {len(all_schedules)} total schedules")  # Debug

@@ -258,6 +258,14 @@ async function addCourse() {
         // Update UI
         updateCourseList();
 
+        // Check if course has no lessons
+        if (data.no_lessons) {
+            alert(`הקורס "${data.course.name}" נוסף לרשימה, אך אין לו שיעורים זמינים בסמסטר ב'`);
+            // Don't update schedule or show modal
+            input.value = '';
+            return;
+        }
+
         // Check if we should show lesson selection modal
         const hasMultipleOptions =
             data.course.lesson_options.lectures.length > 1 ||
