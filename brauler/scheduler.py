@@ -58,6 +58,19 @@ def generate_schedules(courses, max_lectures, max_labs, max_practices):
                 if has_required_lessons(first_course, lessons):
                     yield [(first_course, lessons)] + schedule
 
+def generate_schedules_with_overlaps(courses, max_lectures, max_labs, max_practices):
+    """Generate schedules allowing overlaps between courses - skip overlap check"""
+    if not courses:
+        yield []
+        return
+
+    first_course, rest_courses = courses[0], courses[1:]
+    for schedule in generate_schedules_with_overlaps(rest_courses, max_lectures, max_labs, max_practices):
+        for lessons in find_non_overlapping_lessons(first_course, max_lectures, max_labs, max_practices):
+            # Skip overlap check between courses - allow conflicts
+            if has_required_lessons(first_course, lessons):
+                yield [(first_course, lessons)] + schedule
+
 def calculate_schedule_score(schedule):
     return sum(len(lessons) for _, lessons in schedule)
 

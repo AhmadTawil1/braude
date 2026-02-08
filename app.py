@@ -92,8 +92,8 @@ def add_course():
                 'no_lessons': True  # Flag to indicate course has no lessons
             })
         
-        # Generate ALL possible schedules
-        all_schedules = list(scheduler.generate_schedules(courses_store[session_id], 1, 1, 1))
+        # Always allow overlaps - use overlap-enabled scheduler
+        all_schedules = list(scheduler.generate_schedules_with_overlaps(courses_store[session_id], 1, 1, 1))
         print(f"DEBUG: Generated {len(all_schedules)} total schedules")  # Debug
         
         # Filter valid schedules

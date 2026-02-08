@@ -1,0 +1,86 @@
+/* Allow Overlaps Toggle */
+.overlap-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-left: 20px;
+    user-select: none;
+}
+
+.overlap-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.overlap-toggle input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #3b82f6;
+}
+
+.overlap-toggle span {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+}
+
+/* Side-by-side overlapping lessons */
+.schedule-cell.has-overlap {
+    display: flex;
+    gap: 4px;
+    padding: 3px !important;
+    align-items: stretch;
+}
+
+.lesson-in-overlap {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 4px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.lesson-in-overlap .lesson-course {
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 3px;
+    line-height: 1.2;
+}
+
+.lesson-in-overlap .lesson-time {
+    font-size: 0.65rem;
+    opacity: 0.9;
+    margin-bottom: 2px;
+}
+
+.lesson-in-overlap .lesson-type {
+    font-size: 0.6rem;
+    opacity: 0.8;
+}
+
+/* Responsive adjustments for overlaps */
+@media (max-width: 768px) {
+    .overlap-toggle {
+        padding: 6px 10px;
+        margin-left: 10px;
+    }
+
+    .overlap-toggle span {
+        font-size: 0.8rem;
+    }
+
+    .lesson-in-overlap .lesson-course {
+        font-size: 0.65rem;
+    }
+
+    .lesson-in-overlap .lesson-time,
+    .lesson-in-overlap .lesson-type {
+        font-size: 0.6rem;
+    }
+}

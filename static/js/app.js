@@ -236,7 +236,9 @@ async function addCourse() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ course_id: parseInt(courseId) }), // Ensure course_id is an integer
+            body: JSON.stringify({
+                course_id: parseInt(courseId)
+            }),
         });
 
         const data = await response.json();
@@ -387,20 +389,12 @@ function updateSchedule(schedule) {
 
     currentSchedule = schedule;
 
-    // Group lessons by course
-    const courseMap = new Map();
-    schedule.forEach(lesson => {
-        console.log('Processing lesson:', lesson); // Debug
-        if (!courseMap.has(lesson.course_id)) {
-            courseMap.set(lesson.course_id, []);
-        }
-        courseMap.get(lesson.course_id).push(lesson);
-    });
-
     // Assign colors to courses
-    const courseIds = Array.from(courseMap.keys());
+    const courseIds = [...new Set(schedule.map(l => l.course_id))];
 
-    // Fill schedule cells
+    // Group lessons by cell (day + time slot)
+    const cellLessons = new Map(); // key: "day-timeSlot", value: array of lessons
+
     schedule.forEach(lesson => {
         const dayIndex = DAY_MAPPING[lesson.day];
         const startIndex = TIME_MAPPING[lesson.start];
@@ -413,36 +407,77 @@ function updateSchedule(schedule) {
         const courseIndex = courseIds.indexOf(lesson.course_id);
         const colorClass = COLORS[courseIndex % COLORS.length];
 
+        // Add color class to lesson object for later use
+        lesson.colorClass = colorClass;
+
         // Fill cells for lesson duration
         for (let timeIdx = startIndex; timeIdx < finishIndex; timeIdx++) {
             const time = TIME_SLOTS[timeIdx];
-            const cell = document.querySelector(
-                `.schedule-cell[data-time="${time}"][data-day="${dayIndex}"]`
-            );
+            const cellKey = `${dayIndex}-${time}`;
 
-            if (cell) {
+            if (!cellLessons.has(cellKey)) {
+                cellLessons.set(cellKey, []);
+            }
+
+            // Add lesson to this cell
+            cellLessons.get(cellKey).push(lesson);
+        }
+    });
+
+    // Now render each cell
+    cellLessons.forEach((lessons, cellKey) => {
+        const [dayIndex, time] = cellKey.split('-');
+        const cell = document.querySelector(
+            `.schedule-cell[data-time="${time}"][data-day="${dayIndex}"]`
+        );
+
+        if (!cell) return;
+
+        // Check if there are multiple lessons in this cell (overlap)
+        if (lessons.length > 1) {
+            // Multiple overlapping lessons - display side by side
+            cell.classList.add('has-overlap');
+
+            cell.innerHTML = lessons.map(lesson => {
                 // Abbreviate course name if too long
                 let courseName = lesson.course_name;
-                if (courseName.length > 15) {
-                    courseName = courseName.substring(0, 12) + '...';
+                if (courseName.length > 12) {
+                    courseName = courseName.substring(0, 10) + '...';
                 }
 
-                // Build HTML with lecturer if available
-                let html = `
-                    <div class="lesson-info">
+                return `
+                    <div class="lesson-in-overlap ${lesson.colorClass}">
                         <div class="lesson-course">${courseName}</div>
+                        <div class="lesson-time">${lesson.start}-${lesson.finish}</div>
                         <div class="lesson-type">${lesson.type}</div>
+                    </div>
                 `;
+            }).join('');
 
-                if (lesson.lecturer && lesson.lecturer.trim()) {
-                    html += `<div class="lesson-lecturer">${lesson.lecturer}</div>`;
-                }
+        } else {
+            // Single lesson - normal display
+            const lesson = lessons[0];
 
-                html += `</div>`;
-
-                cell.innerHTML = html;
-                cell.classList.add('filled', colorClass);
+            // Abbreviate course name if too long
+            let courseName = lesson.course_name;
+            if (courseName.length > 15) {
+                courseName = courseName.substring(0, 12) + '...';
             }
+
+            let html = `
+                <div class="lesson-info">
+                    <div class="lesson-course">${courseName}</div>
+                    <div class="lesson-type">${lesson.type}</div>
+            `;
+
+            if (lesson.lecturer && lesson.lecturer.trim()) {
+                html += `<div class="lesson-lecturer">${lesson.lecturer}</div>`;
+            }
+
+            html += `</div>`;
+
+            cell.innerHTML = html;
+            cell.classList.add('filled', lesson.colorClass);
         }
     });
 }
